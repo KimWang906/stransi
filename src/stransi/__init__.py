@@ -11,6 +11,7 @@ __all__ = [
     "SetClear",
     "SetColor",
     "SetCursor",
+    "SetBracketedPaste",
     "Unsupported",
 ]
 
@@ -20,5 +21,6 @@ from .attribute import SetAttribute
 from .clear import SetClear
 from .color import SetColor
 from .cursor import SetCursor
+from .bracketed_paste import SetBracketedPaste
 from .escape import Escape
 from .unsupported import Unsupported

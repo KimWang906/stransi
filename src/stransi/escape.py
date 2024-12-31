@@ -15,6 +15,7 @@ from .cursor import CursorMove, SetCursor
 from .instruction import Instruction
 from .token import Token
 from .unsupported import Unsupported
+from .bracketed_paste import SetBracketedPaste
 
 
 def isescape(text: Text) -> bool:
@@ -26,10 +27,12 @@ class Escape(_CustomText):
     """A single ANSI escape sequence."""
 
     SEPARATOR = re.compile(r";")
+    QUESTION_MARK = "?"
     ALL_ATTRIBUTE_CODES: set[int] = set(a.value for a in Attribute)
     ALL_FOREGROUND_CODES: set[int] = set(range(30, 40)) | set(range(90, 98))
     ALL_BACKGROUND_CODES: set[int] = set(range(40, 50)) | set(range(100, 108))
     ALL_COLOR_CODES: set[int] = ALL_FOREGROUND_CODES | ALL_BACKGROUND_CODES
+    ALL_BRACKETED_PASTE_CODES: set[int] = {2004}
 
     def tokens(self) -> Iterator[Token]:
         """Yield individual tokens from the escape sequence."""
@@ -38,6 +41,9 @@ class Escape(_CustomText):
         for param in _isplit(self[2:-1], self.SEPARATOR):
             if not param:
                 yield Token(kind=kind, data=0)
+                continue
+            if param.startswith(self.QUESTION_MARK):
+                yield Token(kind=kind, data=int(param[1:]))
                 continue
             yield Token(kind=kind, data=int(param))
 
@@ -56,7 +62,11 @@ class Escape(_CustomText):
         """
         tokens = self.tokens()
         while token := next(tokens, None):
-            if token.issgr():
+            if token.issgr() or token.isbracketed_paste():
+                if token.data in self.ALL_BRACKETED_PASTE_CODES:
+                    yield SetBracketedPaste(token.data, token.kind == "h")
+                    continue
+
                 if token.data in self.ALL_ATTRIBUTE_CODES:
                     yield SetAttribute(Attribute(token.data))
                     continue

@@ -38,3 +38,9 @@ class Token:
         False
         """
         return self.kind == "m"
+
+    def isbracketed_paste(self) -> bool:
+        """
+        Return True if this is a Bracketed Paste sequence (kind 'h' or 'l').
+        """
+        return self.kind in {"h", "l"}

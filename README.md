@@ -23,7 +23,7 @@ output manipulation.
 -   🎨 Focus on coloring and styling
 -   🛡️ Unsupported `CSI` escape sequences are emitted as tokens
 -   🏜️ Only one dependency: [ochre](https://github.com/getcuia/ochre)
--   🐍 Python 3.8+
+-   🐍 Python 3.12+
 
 ## Installation
 
